@@ -128,6 +128,101 @@ PYTHONPATH=. pytest test/test_main.py -v
 > **Note:** Ensure Docker and Python dependencies are installed on the cloud server.
 
 ---
+Sure! Here’s an **updated README section with Render deployment instructions** as a barebone cloud CI/CD option. I’ve added a full “Deploy on Render” section that integrates your Docker container.
+
+---
+
+## **Cloud Deployment – Render (Barebone CI/CD)**
+
+Render provides a free or low-cost option to deploy Dockerized apps with automatic CI/CD updates from GitHub. This is ideal if you want a **publicly accessible endpoint** without managing EC2 or GCP billing.
+
+### **1. Prepare Repository for Render**
+
+1. Push your project to **GitHub**:
+
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/your-username/dance-movement-analysis.git
+git push -u origin main
+```
+
+2. Ensure your **Dockerfile** is at the root of the repo.
+
+---
+
+### **2. Create a New Web Service on Render**
+
+1. Go to [Render Dashboard](https://render.com/dashboard) → Click **New** → **Web Service**.
+2. Connect your **GitHub repository** containing the project.
+3. Choose **Docker** as the Environment.
+4. Set **Name**: `dance-analyzer` (or any name).
+5. Set **Branch**: `main`
+6. Set **Port**: `8000` (your FastAPI server port)
+
+> Render will automatically detect your `Dockerfile` and build the image.
+
+---
+
+### **3. Configure Build & Start Commands**
+
+Render handles Docker builds automatically, so you usually do **not need extra commands**.
+Make sure your `CMD` in Dockerfile is correct:
+
+```dockerfile
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+```
+
+---
+
+### **4. Environment Variables (Optional)**
+
+If your app needs any API keys or config, you can add them in **Render → Environment → Environment Variables**.
+
+---
+
+### **5. Deploy**
+
+Click **Create Web Service**.
+Render will:
+
+1. Pull the latest code from GitHub
+2. Build your Docker image
+3. Run the container
+4. Assign a **public URL** (e.g., `https://dance-analyzer.onrender.com`)
+
+---
+
+### **6. Access & Test**
+
+* Web UI: `https://<your-render-url>/`
+* API endpoint: `https://<your-render-url>/analyze`
+
+**Example using `curl`:**
+
+```bash
+curl -X POST -F "file=@sample_video/testvideo.mp4" https://<your-render-url>/analyze --output result.mp4
+```
+
+---
+
+### **7. CI/CD Updates**
+
+* Every **push to `main` branch** will trigger Render to rebuild and redeploy the Docker container automatically.
+* No manual intervention is required once set up.
+
+---
+
+### **8. Notes**
+
+* Render’s free tier provides ~750 hours/month for web services.
+* For larger videos or higher traffic, consider **Paid Plan** or EC2/GCP.
+* Ensure your container **exposes port 8000** and `uvicorn` binds to `0.0.0.0`.
+
+---
+
 
 ## **Thought Process**
 
@@ -144,8 +239,34 @@ PYTHONPATH=. pytest test/test_main.py -v
 ---
 
 
+## **How This Project Fits with Callus’s Vision**
 
+Callus Company Inc. focuses on leveraging AI/ML solutions to **enhance human-centric processes, decision-making, and real-time insights**. This Dance Movement Analysis server aligns with Callus’s vision in several ways:
 
+1. **AI-driven Analysis of Human Movement**
+
+   * The system uses MediaPipe and OpenCV to extract and visualize body keypoints, enabling objective, data-driven insights into physical movement patterns.
+   * This mirrors Callus’s focus on **applying AI to understand and improve human activities**.
+
+2. **Real-time Feedback and Efficiency**
+
+   * By providing immediate visual feedback through skeleton overlays on uploaded dance videos, the platform demonstrates the power of AI to **analyze, interpret, and enhance real-world tasks in real time**, a core aspect of Callus’s AI solutions.
+
+3. **Scalable Cloud Deployment**
+
+   * Containerized with Docker and deployable on any cloud environment, this solution illustrates Callus’s vision for **flexible, scalable, and accessible AI systems** that can be used by multiple users without specialized hardware.
+
+4. **Automation and Insights for Decision-Making**
+
+   * The server automates pose detection, video processing, and analysis, supporting **faster, more accurate human activity insights**, which aligns with Callus’s mission to empower decision-making through AI.
+
+5. **Extensible Platform for Future AI Solutions**
+
+   * The modular design allows integration of more advanced AI/ML analytics (e.g., motion scoring, performance optimization, or injury prevention), reflecting Callus’s commitment to **innovation and expanding AI capabilities in real-world applications**.
+
+**In essence:** This project demonstrates how AI/ML can transform human-centered activities into **actionable insights**, reflecting Callus’s mission to develop practical, scalable, and intelligent AI solutions for the real world.
+
+---
 
 # **Dance Movement Analysis API – Test**
 
