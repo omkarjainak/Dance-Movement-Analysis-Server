@@ -25,29 +25,32 @@
         const form = document.getElementById("uploadForm");
         const downloadLink = document.getElementById("downloadLink");
 
-        form.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const formData = new FormData(form);
+       fform.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
 
-            const response = await fetch("/analyze", {
-                method: "POST",
-                body: formData
-            });
-
-            if (response.ok) {
-                // Create a temporary download URL
-                const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
-
-                downloadLink.href = url;
-                downloadLink.download = "analysis_result.mp4";
-                downloadLink.style.display = "block";
-                downloadLink.textContent = "Download Processed Video";
-            } else {
-                const data = await response.json();
-                alert("Error: " + data.detail);
-            }
+    try {
+        const response = await fetch("/analyze", {
+            method: "POST",
+            body: formData
         });
+
+        if (!response.ok) {
+            const text = await response.text();
+            alert("Error: " + text);
+            return;
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        video.src = url;
+        video.style.display = "block";
+
+    } catch (err) {
+        alert("Network error: " + err.message);
+    }
+});
+
     </script>
 </body>
 </html>
