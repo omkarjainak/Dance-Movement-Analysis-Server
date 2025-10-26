@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dance Movement Analysis</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h1 { color: #333; }
+        input[type="file"] { margin: 10px 0; }
+        button { padding: 10px 20px; cursor: pointer; }
+        a { display: block; margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Dance Movement Analysis</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="file" accept="video/*" required>
+        <br>
+        <button type="submit">Upload & Analyze</button>
+    </form>
+
+    <a id="downloadLink" href="#" style="display:none;">Download Processed Video</a>
+
+    <script>
+        const form = document.getElementById("uploadForm");
+        const downloadLink = document.getElementById("downloadLink");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+
+            const response = await fetch("/analyze", {
+                method: "POST",
+                body: formData
+            });
+
+            if (response.ok) {
+                // Create a temporary download URL
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+
+                downloadLink.href = url;
+                downloadLink.download = "analysis_result.mp4";
+                downloadLink.style.display = "block";
+                downloadLink.textContent = "Download Processed Video";
+            } else {
+                const data = await response.json();
+                alert("Error: " + data.detail);
+            }
+        });
+    </script>
+</body>
+</html>
